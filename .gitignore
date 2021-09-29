@@ -1,0 +1,5 @@
+.idea
+build
+.gradle
+database.mv.db
+/config.json

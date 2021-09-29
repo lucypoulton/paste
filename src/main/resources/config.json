@@ -1,0 +1,14 @@
+{
+	"oauth": {
+		"authorizeUrl": "",
+		"accessTokenUrl": "",
+		"userinfoUrl": "",
+		"clientId": "",
+		"clientSecret": "",
+		"scopes": []
+	},
+	"server": {
+		"hostname": "https://paste.lucypoulton.net",
+		"port": 8080
+	}
+}
