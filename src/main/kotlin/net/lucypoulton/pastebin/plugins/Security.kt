@@ -23,7 +23,7 @@ import kotlin.collections.set
 import kotlin.properties.Delegates
 
 @Serializable
-data class UserSession(val accessToken: String, val username: String, val role: Short)
+data class UserSession(val username: String, val role: Int) : Principal
 
 fun Application.configureSecurity() {
 
@@ -80,8 +80,8 @@ fun Application.configureSecurity() {
                     role = Privileges.select { Privileges.user eq username }.map { it[Privileges.role] }.maxOrNull() ?: 0
                 }
 
-                call.sessions.set(UserSession(principal?.accessToken.toString(), username, role))
-                call.respondRedirect("/hello")
+                call.sessions.set(UserSession(username, role.toInt()))
+                call.respondRedirect("/")
             }
         }
     }
