@@ -40,5 +40,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
-    implementation("com.h2database:h2:1.4.200")
+
+    // https://github.com/h2database/h2database/issues/2191
+    implementation("com.h2database:h2:1.4.199")
 }

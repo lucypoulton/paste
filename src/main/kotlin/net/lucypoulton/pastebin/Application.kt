@@ -2,6 +2,8 @@ package net.lucypoulton.pastebin
 
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
 import io.ktor.features.AutoHeadResponse.install
 import io.ktor.freemarker.*
 import io.ktor.server.engine.*
@@ -21,6 +23,7 @@ fun Application.module() {
         SchemaUtils.create(Pastes)
         SchemaUtils.create(Privileges)
     }
+
     install(FreeMarker) {
         templateLoader = ClassTemplateLoader(this::class.java.classLoader, "/templates")
     }

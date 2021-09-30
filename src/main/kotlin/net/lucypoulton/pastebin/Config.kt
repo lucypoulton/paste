@@ -6,16 +6,16 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
 
-val Application.config by lazy {
-    val configFile = File("config.json")
+val Application.config: Config by lazy {
+        val configFile = File("config.json")
 
-    if (configFile.createNewFile()) {
-        // if this fails then the jarfile is broken
-        Application::class.java.getResourceAsStream("config.json")!!.copyTo(configFile.outputStream())
+        if (configFile.createNewFile()) {
+            // if this fails then the jarfile is broken
+            Application::class.java.getResourceAsStream("/config.json")!!.copyTo(configFile.outputStream())
+        }
+
+        return@lazy Json.decodeFromStream(configFile.inputStream())
     }
-
-    return@lazy Json.decodeFromStream<Config>(configFile.inputStream())
-}
 
 @Serializable
 data class Config(val oauth: OAuthConfig, val server: ServerConfig)

@@ -4,30 +4,36 @@ import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.client.*
 import io.ktor.client.engine.apache.*
+import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.sessions.*
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import net.lucypoulton.pastebin.Config
 import net.lucypoulton.pastebin.Privileges
 import net.lucypoulton.pastebin.config
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.transaction
 import javax.naming.AuthenticationException
 import kotlin.collections.set
+import kotlin.properties.Delegates
 
+@Serializable
 data class UserSession(val accessToken: String, val username: String, val role: Short)
 
 fun Application.configureSecurity() {
 
-    val client = HttpClient(Apache)
+    val client = HttpClient(Apache) {
+        install(JsonFeature)
+    }
 
     install(Authentication) {
         oauth("oauth") {
-            urlProvider = { "${environment.config.property("server.hostname").getString()}/callback" }
+            urlProvider = { "${config.server.hostname}/callback" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
                     name = "oauth",
@@ -43,7 +49,7 @@ fun Application.configureSecurity() {
         }
     }
     install(Sessions) {
-        cookie<UserSession>("SESSION") {
+        cookie<UserSession>("SESSION", storage = SessionStorageMemory()) {
             cookie.extensions["SameSite"] = "lax"
         }
     }
@@ -59,7 +65,7 @@ fun Application.configureSecurity() {
 
                 val accessToken = principal?.accessToken.toString()
 
-                val data : JsonElement = client.get(environment.config.property("oauth.userinfoUrl").getString()) {
+                val data : JsonElement = client.get(config.oauth.userinfoUrl) {
                     headers {
                         append(HttpHeaders.Authorization, "Bearer $accessToken")
                     }
@@ -68,7 +74,11 @@ fun Application.configureSecurity() {
                 val username = data.jsonObject["username"]?.jsonPrimitive?.content ?:
                 throw AuthenticationException("Username was missing")
 
-                val role = Privileges.select { Privileges.user eq username }.maxOf { it[Privileges.role] }
+                var role by Delegates.notNull<Short>()
+
+                transaction {
+                    role = Privileges.select { Privileges.user eq username }.map { it[Privileges.role] }.maxOrNull() ?: 0
+                }
 
                 call.sessions.set(UserSession(principal?.accessToken.toString(), username, role))
                 call.respondRedirect("/hello")
