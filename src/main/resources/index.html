@@ -1,0 +1,39 @@
+<!--#-- @ftlvariable name="session" type="net.lucypoulton.pastebin.plugins.UserSession" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://branding.lucyy.me/lucy.css">
+    <!--TODO - proper name and title -->
+    <title>Lucy's Pastebin</title>
+
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="assets/prism.css">
+    <link rel="stylesheet" href="assets/prism-live.css">
+    <link rel="stylesheet" href="assets/index.css">
+</head>
+<body class="bg-dark">
+<div class="header">
+    <input type="text" class="input" id="nameInput" placeholder="Title">
+    <span class="language">
+        <input type="text" class="input" id="langInput" value="java" onclick="startSearch()" oninput="search()">
+        <div id="langDropdown" class="hidden"></div>
+    </span>
+    <span style="float: right">
+        <!--TODO uncomment#
+        <#if session?has_content>
+            ${session.username}
+        <#else>
+            Not logged in
+        </#if>-->
+        Login
+    </span>
+</div>
+<div id="outer">
+    <textarea spellcheck="false" class="prism-live line-numbers language-java"></textarea>
+</div>
+<script src="assets/prism.js"></script>
+<script src="assets/prism-live.js"></script>
+<script src="assets/index.js"></script>
+</body>
+</html>

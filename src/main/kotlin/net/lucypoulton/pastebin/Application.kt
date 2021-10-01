@@ -4,8 +4,9 @@ import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
-import io.ktor.features.AutoHeadResponse.install
 import io.ktor.freemarker.*
+import io.ktor.http.content.*
+import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import net.lucypoulton.pastebin.plugins.configureRouting
@@ -28,6 +29,11 @@ fun Application.module() {
         templateLoader = ClassTemplateLoader(this::class.java.classLoader, "/templates")
     }
 
+    routing {
+        static {
+            file("assets")
+        }
+    }
     configureRouting()
     configureSecurity()
 }
